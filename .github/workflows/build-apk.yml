@@ -1,0 +1,40 @@
+name: Build SUBIRA MESH APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Installer Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extraire le projet Android
+        run: |
+          unzip -q SUBIRA_MESH_V03_CODE_SOURCE.zip -d source
+
+      - name: Compiler APK
+        run: |
+          gradle -p source/SUBIRA_MESH_Android_V03 assembleDebug
+
+      - name: Publier le fichier APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SUBIRA-MESH-APK
+          path: source/SUBIRA_MESH_Android_V03/app/build/outputs/apk/debug/app-debug.apk
